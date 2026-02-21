@@ -4,3 +4,54 @@ GET {{WebApiP33_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+
+POST {{WebApiP33_HostAddress}}/calculator/sum
+Content-Type: application/json
+
+{
+  "number1": 4,
+  "number2": 10.5
+}
+
+
+###
+
+#
+> {%
+client.test("Sum of 4 and 10.5 should be 14.5")
+    .expectStatus(200)
+    .expectJson({ result: 14.5 })
+%}
+
+###
+POST {{WebApiP33_HostAddress}}/calculator/subtract
+Content-Type: application/json
+
+{
+  "number1": 4,
+  "number2": 10.5
+}
+
+
+
+###
+
+POST {{WebApiP33_HostAddress}}/calculator/sum-many
+Content-Type: application/json
+
+[
+  {
+    "number1": 4,
+    "number2": 10.5
+  },
+  {
+    "number1": 2,
+    "number2": 3
+  },
+  {
+    "number1": 5,
+    "number2": 5
+  }
+]
+
