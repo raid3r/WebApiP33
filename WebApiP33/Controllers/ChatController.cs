@@ -8,12 +8,25 @@ namespace WebApiP33.Controllers;
 [Route("[controller]")] // /calculator
 public class ChatController : ControllerBase
 {
+    // Список чатів (з ким спілкується користувач)
+    [HttpGet("chats")]
+    public async Task<IEnumerable<UserDto>> GetChats()
+    {
+        // TODO : реалізувати завантаження списку чатів для користувача
+        
+        return [
+            new UserDto { RecipientId = 2, Name = "Jane Smith" },
+            new UserDto { RecipientId = 3, Name = "Bob Johnson" }
+        ];
+    }
+
     // Завантажити повідомлення
     [HttpGet("messages/{recipientId:int}")]
     public async Task<IEnumerable<MessageDto>> GetMessages(int recipientId)
     {
+        // int page = 1, int pageSize = 20 
         // TODO : реалізувати завантаження повідомлень для отримувача
-        
+
         var messages = new List<MessageDto>
         {
             new MessageDto
