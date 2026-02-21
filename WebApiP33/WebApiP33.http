@@ -1,0 +1,6 @@
+@WebApiP33_HostAddress = http://localhost:5203
+
+GET {{WebApiP33_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
