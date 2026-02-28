@@ -15,8 +15,8 @@ public class ChatController : ControllerBase
         // TODO : реалізувати завантаження списку чатів для користувача
         
         return [
-            new UserDto { RecipientId = 2, Name = "Jane Smith" },
-            new UserDto { RecipientId = 3, Name = "Bob Johnson" }
+            new UserDto { RecipientId = 2, Email = "jane.smith@test.com" },
+            new UserDto { RecipientId = 3, Email = "bob.johnson@test.com" }
         ];
     }
 
@@ -32,16 +32,16 @@ public class ChatController : ControllerBase
             new MessageDto
             {
                 Id = 1,
-                From = new UserDto { RecipientId = 2, Name = "Jane Smith" },
-                To = new UserDto { RecipientId = recipientId, Name = "John Doe" },
+                From = new UserDto { RecipientId = 2, Email = "jane.smith@test.com" },
+                To = new UserDto { RecipientId = recipientId, Email = "john.doe@test.com" },
                 Text = "Привіт!",
                 Timestamp = DateTime.UtcNow.AddMinutes(-10)
             },
             new MessageDto
             {
                 Id = 2,
-                From = new UserDto { RecipientId = recipientId, Name = "John Doe" },
-                To = new UserDto { RecipientId = 2, Name = "Jane Smith" },
+                From = new UserDto { RecipientId = recipientId, Email = "john.doe@test.com" },
+                To = new UserDto { RecipientId = 2, Email = "jane.smith@test.com" },
                 Text = "Привіт, як справи?",
                 Timestamp = DateTime.UtcNow.AddMinutes(-5)
             }
@@ -68,8 +68,8 @@ public class ChatController : ControllerBase
         // TODO : реалізувати пошук користувачів за іменем
 
         return [
-            new UserDto { RecipientId = 1, Name = "John Doe" },
-            new UserDto { RecipientId = 2, Name = "Jane Smith" }
+            new UserDto { RecipientId = 1, Email = "john.doe@test.com" },
+            new UserDto { RecipientId = 2, Email = "jane.smith@test.com" }
         ];
     }
 

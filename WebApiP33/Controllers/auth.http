@@ -1,0 +1,33 @@
+@WebApiP33_HostAddress = https://localhost:7025
+
+### Register a new user
+POST {{WebApiP33_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "test1@test.com",
+  "password": "1111"
+}
+
+
+### Login with the registered user
+POST {{WebApiP33_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test1@test.com",
+  "password": "1111"
+}
+
+
+### get profile of the logged in user
+@token=eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ0ZXN0MUB0ZXN0LmNvbSIsInN1YiI6InRlc3QxQHRlc3QuY29tIiwibmFtZSI6InRlc3QxQHRlc3QuY29tIiwianRpIjoiMzdiMzc0OTItYTM1OS00ZTRkLTgwYTYtZjc1ZGFiZGY4MTY3IiwiZW1haWwiOiJ0ZXN0MUB0ZXN0LmNvbSIsImV4cCI6MTc3MjUzODI2MH0.O7bLgtkmI4Hh2U4RMCb-x3GHAi9XaT2BW3lLxzO1xU0
+
+###
+
+GET {{WebApiP33_HostAddress}}/api/v1/profile
+Authorization: Bearer {{token}}
+Accept: application/json
+
+
+### curl -X GET "http://localhost:5203/api/v1/profile" -H "Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ0ZXN0MUB0ZXN0LmNvbSIsInN1YiI6InRlc3QxQHRlc3QuY29tIiwibmFtZSI6InRlc3QxQHRlc3QuY29tIiwianRpIjoiMzdiMzc0OTItYTM1OS00ZTRkLTgwYTYtZjc1ZGFiZGY4MTY3IiwiZW1haWwiOiJ0ZXN0MUB0ZXN0LmNvbSIsImV4cCI6MTc3MjUzODI2MH0.O7bLgtkmI4Hh2U4RMCb-x3GHAi9XaT2BW3lLxzO1xU0"
