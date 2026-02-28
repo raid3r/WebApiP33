@@ -1,0 +1,31 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
+namespace WebApiP33.Models.DAL;
+
+public class ChatContext : IdentityDbContext<User, IdentityRole<int>, int>
+
+{
+    // Конструктор за замовченням
+    public ChatContext() : base() { }   
+    // Конструктор з параметрами для налаштування контексту
+    public ChatContext(DbContextOptions<ChatContext> options) : base(options) { }
+
+    // Визначення DbSet для сутностей
+    public DbSet<ChatMessage> ChatMessages { get; set; }
+    public DbSet<Recipient> Recipients { get; set; }
+
+    // Метод для налаштування моделі та конфігурації бази даних
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Data Source=SILVERSTONE\\SQLEXPRESS;Initial Catalog=WebApiExampleP34;Integrated Security=True;Persist Security Info=False;Pooling=False;Multiple Active Result Sets=False;Connect Timeout=60;Encrypt=True;Trust Server Certificate=True;");
+
+        }
+        // Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False
+
+    }
+
+}
