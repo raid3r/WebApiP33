@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import api from '../services/api'
+import UserListItem from '../components/UserListItem.vue'
 
 interface RecipientDto {
   id: number
@@ -27,6 +28,9 @@ const profileError = ref('')
 const searchTerm = ref('')
 const searchResults = ref<UserDto[]>([])
 const searchError = ref('')
+const chats = ref<UserDto[]>([])
+const chatsError = ref('')
+const isLoadingChats = ref(false)
 const selectedUser = ref<UserDto | null>(null)
 const messages = ref<MessageDto[]>([])
 const messageText = ref('')
@@ -40,6 +44,7 @@ const lastMessageId = ref<number | null>(null)
 const currentRecipientId = computed(() => profile.value?.recipientId ?? 0)
 
 const displayName = (user: UserDto) => user.recipient?.name || user.email
+const secondaryLabel = (user: UserDto) => ''
 
 const scrollToBottom = async () => {
   await nextTick()
@@ -55,6 +60,19 @@ const loadProfile = async () => {
     profile.value = response.data
   } catch (error) {
     profileError.value = 'Unable to load profile'
+  }
+}
+
+const loadChats = async () => {
+  chatsError.value = ''
+  isLoadingChats.value = true
+  try {
+    const response = await api.get('/api/v1/chat/chats')
+    chats.value = response.data || []
+  } catch (error) {
+    chatsError.value = 'Unable to load chats'
+  } finally {
+    isLoadingChats.value = false
   }
 }
 
@@ -115,6 +133,7 @@ const sendMessage = async () => {
     })
     messageText.value = ''
     await loadMessages()
+    await loadChats()
   } finally {
     isSending.value = false
   }
@@ -144,6 +163,7 @@ const schedulePoll = () => {
 
 onMounted(async () => {
   await loadProfile()
+  await loadChats()
   schedulePoll()
 })
 
@@ -165,7 +185,7 @@ onUnmounted(() => {
         <span class="dot"></span>
         <div>
           <strong>{{ profile.email }}</strong>
-          <span class="muted">Recipient #{{ profile.recipientId }}</span>
+          <!-- <span class="muted">Recipient #{{ profile.recipientId }}</span> -->
         </div>
       </div>
     </header>
@@ -174,6 +194,28 @@ onUnmounted(() => {
 
     <div class="chat-layout">
       <aside class="card panel">
+        <div>
+          <h2>Your chats</h2>
+          <p class="muted">People you have already messaged.</p>
+        </div>
+        <div class="list">
+          <p v-if="isLoadingChats" class="muted">Loading chats...</p>
+          <p v-else-if="chatsError" class="notice error">{{ chatsError }}</p>
+          <p v-else-if="!chats.length" class="muted">No chats yet.</p>
+          <button
+            v-for="user in chats"
+            :key="user.recipientId"
+            class="list-item"
+            :class="{ active: selectedUser?.recipientId === user.recipientId }"
+            type="button"
+            @click="selectUser(user)"
+          >
+            <UserListItem :label="displayName(user)" :secondary="secondaryLabel(user)" />
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
         <h2>Find people</h2>
         <form class="form" @submit.prevent="findUsers">
           <div class="field">
@@ -185,6 +227,7 @@ onUnmounted(() => {
         </form>
 
         <div class="list">
+          <p v-if="!searchResults.length && !searchError" class="muted">No results yet.</p>
           <button
             v-for="user in searchResults"
             :key="user.recipientId"
@@ -193,11 +236,7 @@ onUnmounted(() => {
             type="button"
             @click="selectUser(user)"
           >
-            <span class="avatar">{{ displayName(user).slice(0, 1).toUpperCase() }}</span>
-            <div>
-              <strong>{{ displayName(user) }}</strong>
-              <span class="muted">Recipient #{{ user.recipientId }}</span>
-            </div>
+            <UserListItem :label="displayName(user)" :secondary="secondaryLabel(user)" />
           </button>
         </div>
       </aside>

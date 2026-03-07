@@ -250,6 +250,12 @@ h2 {
   gap: 10px;
 }
 
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
 .list-item {
   display: grid;
   grid-template-columns: 44px 1fr;
