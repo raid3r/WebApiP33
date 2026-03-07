@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApiP33.Models;
 using WebApiP33.Models.DAL;
+using WebApiP33.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,8 @@ builder.Services.AddDbContext<ChatContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddCors(options =>
 {

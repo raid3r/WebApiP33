@@ -1,0 +1,88 @@
+//@WebApiP33_HostAddress = https://localhost:7025
+@WebApiP33_HostAddress = http://localhost:5203
+
+### Register user1
+POST {{WebApiP33_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "user1@test.com",
+  "password": "1111"
+}
+
+@token1 = eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ1c2VyMUB0ZXN0LmNvbSIsInN1YiI6InVzZXIxQHRlc3QuY29tIiwibmFtZSI6InVzZXIxQHRlc3QuY29tIiwianRpIjoiYWJjMjgyYWEtNTIxZC00ZmEwLWJjODktZThhOGY5ZWVhMGIzIiwiZW1haWwiOiJ1c2VyMUB0ZXN0LmNvbSIsImV4cCI6MTc3MzE0MDc1N30.21HqJQCmWckxkdFzKKwIGkLJbP21MlRYV47MyIjdcqI
+@token2 = eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJ1c2VyMkB0ZXN0LmNvbSIsInN1YiI6InVzZXIyQHRlc3QuY29tIiwibmFtZSI6InVzZXIyQHRlc3QuY29tIiwianRpIjoiZWJmOTgwNWEtMTAxZi00NjNkLTk5MTYtZDNmOTAwY2U2YWM1IiwiZW1haWwiOiJ1c2VyMkB0ZXN0LmNvbSIsImV4cCI6MTc3MzE0MDc5Mn0.wwNm06Vg6Uwc166mroewRGyTdfDZYbNxM0Tr7mks5mo
+
+### Register user2
+POST {{WebApiP33_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "user2@test.com",
+  "password": "1111"
+}
+
+### Login user1
+# @name loginUser1
+POST {{WebApiP33_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@test.com",
+  "password": "1111"
+}
+
+### Login user2
+# @name loginUser2
+POST {{WebApiP33_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user2@test.com",
+  "password": "1111"
+}
+
+> {%
+client.global.set("token2", response.body.token);
+%}
+
+### Get profile user1
+# @name profileUser1
+GET {{WebApiP33_HostAddress}}/api/v1/profile
+Authorization: Bearer {{token1}}
+Accept: application/json
+
+### Get profile user2 (captures recipient2Id)
+# @name profileUser2
+GET {{WebApiP33_HostAddress}}/api/v1/profile
+Authorization: Bearer {{token2}}
+Accept: application/json
+
+> {%
+client.global.set("recipient2Id", response.body.recipientId);
+%}
+
+### Find users by name (user1)
+POST {{WebApiP33_HostAddress}}/api/v1/chat/find-users
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "name": "user"
+}
+
+@recipient2Id = 2
+### Send message from user1 to user2
+POST {{WebApiP33_HostAddress}}/api/v1/chat/send
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "recipientId": {{recipient2Id}},
+  "text": "Hello from user1"
+}
+
+### Get messages between user1 and user2
+GET {{WebApiP33_HostAddress}}/api/v1/chat/messages/{{recipient2Id}}
+Authorization: Bearer {{token1}}
+Accept: application/json

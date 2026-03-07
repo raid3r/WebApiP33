@@ -1,53 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WebApiP33.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApiP33.Models.Dto;
+using WebApiP33.Services;
 
 namespace WebApiP33.Controllers;
 
+[Authorize]
 [ApiController]
-[Route("[controller]")] // /calculator
-public class ChatController : ControllerBase
+[Route("api/v1/chat")]
+public class ChatController(IChatService chatService) : ControllerBase
 {
     // Список чатів (з ким спілкується користувач)
     [HttpGet("chats")]
     public async Task<IEnumerable<UserDto>> GetChats()
     {
-        // TODO : реалізувати завантаження списку чатів для користувача
-        
-        return [
-            new UserDto { RecipientId = 2, Email = "jane.smith@test.com" },
-            new UserDto { RecipientId = 3, Email = "bob.johnson@test.com" }
-        ];
+        return await chatService.GetChatsAsync(GetCurrentUserId());
     }
 
     // Завантажити повідомлення
     [HttpGet("messages/{recipientId:int}")]
     public async Task<IEnumerable<MessageDto>> GetMessages(int recipientId)
     {
-        // int page = 1, int pageSize = 20 
-        // TODO : реалізувати завантаження повідомлень для отримувача
-
-        var messages = new List<MessageDto>
-        {
-            new MessageDto
-            {
-                Id = 1,
-                From = new UserDto { RecipientId = 2, Email = "jane.smith@test.com" },
-                To = new UserDto { RecipientId = recipientId, Email = "john.doe@test.com" },
-                Text = "Привіт!",
-                Timestamp = DateTime.UtcNow.AddMinutes(-10)
-            },
-            new MessageDto
-            {
-                Id = 2,
-                From = new UserDto { RecipientId = recipientId, Email = "john.doe@test.com" },
-                To = new UserDto { RecipientId = 2, Email = "jane.smith@test.com" },
-                Text = "Привіт, як справи?",
-                Timestamp = DateTime.UtcNow.AddMinutes(-5)
-            }
-        };
-        
-        return messages;
+        return await chatService.GetMessagesAsync(GetCurrentUserId(), recipientId);
     }
 
 
@@ -55,8 +30,7 @@ public class ChatController : ControllerBase
     [HttpPost("send")]
     public async Task<SendMessageResultDto> SendMessage(SendMessageRequestDto request)
     {
-        // TODO : реалізувати надсилання повідомлення
-        return new SendMessageResultDto { MessageId = 123 };
+        return await chatService.SendMessageAsync(GetCurrentUserId(), request);
     }
 
 
@@ -65,12 +39,13 @@ public class ChatController : ControllerBase
     [HttpPost("find-users")]
     public async Task<IEnumerable<UserDto>> FindUsers(UserSearchDto search)
     {
-        // TODO : реалізувати пошук користувачів за іменем
+        return await chatService.FindUsersAsync(GetCurrentUserId(), search);
+    }
 
-        return [
-            new UserDto { RecipientId = 1, Email = "john.doe@test.com" },
-            new UserDto { RecipientId = 2, Email = "jane.smith@test.com" }
-        ];
+    private int GetCurrentUserId()
+    {
+        var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        return int.Parse(currentUserId!);
     }
 
 }

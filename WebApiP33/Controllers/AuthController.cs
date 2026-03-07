@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebApiP33.Models;
+using WebApiP33.Models.DAL;
 using WebApiP33.Models.Dto;
 using WebApiP33.Models.Dto.Auth;
 
@@ -14,7 +15,8 @@ namespace WebApiP33.Controllers;
 [Route("api/v1/auth")]
 public class AuthController(
     UserManager<User> userManager, 
-    IConfiguration configuration
+    IConfiguration configuration,
+    ChatContext chatContext
     ) : ControllerBase
 {
     // register
@@ -47,6 +49,14 @@ public class AuthController(
                 Error = string.Join("; ", createResult.Errors.Select(e => e.Description))
             };
         }
+
+        chatContext.Users.Attach(newUser);
+        chatContext.Recipients.Add(new Recipient
+        {
+            Name = request.Email,
+            User = newUser
+        });
+        await chatContext.SaveChangesAsync();
 
         var token = GenerateJwtToken(newUser);
         return new AuthResultDto

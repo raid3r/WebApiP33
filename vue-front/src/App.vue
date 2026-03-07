@@ -1,86 +1,43 @@
 <script setup lang="ts">
-  import HelloWorld from './components/HelloWorld.vue'
-import LoginForm from './components/LoginForm.vue'
-  import TheWelcome from './components/TheWelcome.vue'
+import { computed, ref, watch } from 'vue'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 
+const router = useRouter()
+const route = useRoute()
+const token = ref(localStorage.getItem('token'))
 
-  async function testProfile() {
-    await fetch('/api/v1/profile', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(res => res.json())
-      .then(data => {
-        console.log(data)
-      })
-      .catch(err => {
-        console.error(err)
-      })
+watch(
+  () => route.fullPath,
+  () => {
+    token.value = localStorage.getItem('token')
   }
+)
 
-  async function test() {
-    const login = {
-      "email": "test1@test.com",
-      "password": "1111"
-    };
+const isAuthed = computed(() => Boolean(token.value))
 
-    await fetch('/api/v1/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(login)
-    }).then(res => res.json())
-      .then(data => {
-        console.log(data)
-      })
-      .catch(err => {
-        console.error(err)
-      })
-  }
-
-
-
+const logout = () => {
+  localStorage.removeItem('token')
+  token.value = null
+  router.push('/login')
+}
 </script>
 
 <template>
-  <header>
+  <div class="app-shell">
+    <header class="app-header">
+      <RouterLink class="brand" to="/">
+        <span class="brand-mark"></span>
+        <span>PulseChat</span>
+      </RouterLink>
+      <nav class="nav-actions">
+        <RouterLink v-if="!isAuthed" class="text-link" to="/login">Sign in</RouterLink>
+        <RouterLink v-if="!isAuthed" class="text-link" to="/register">Register</RouterLink>
+        <button v-if="isAuthed" class="button ghost" type="button" @click="logout">Logout</button>
+      </nav>
+    </header>
 
-
-  </header>
-
-  <main>
-    <LoginForm />
-
-  </main>
+    <main class="app-main">
+      <RouterView />
+    </main>
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
