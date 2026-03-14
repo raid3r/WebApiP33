@@ -1,0 +1,13 @@
+**/.git
+**/.idea
+**/bin
+**/obj
+**/.vs
+
+# Frontend build artifacts (built inside its own Docker stage)
+vue-front/node_modules
+vue-front/dist
+
+# Env secrets — never send to daemon
+.env
+
