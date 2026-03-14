@@ -109,6 +109,13 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Auto-apply EF Core migrations on startup (creates DB if it doesn't exist)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ChatContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -116,15 +123,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS in Development (Docker runs plain HTTP on port 8080)
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapControllers();
-
-app.UseCors("AllowAll");
 
 
 app.Run();
