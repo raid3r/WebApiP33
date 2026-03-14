@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -41,6 +42,14 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();  // Allow any header
     });
 });
+
+// For production behind nginx/another reverse proxy with HTTPS termination, enable when needed:
+// builder.Services.Configure<ForwardedHeadersOptions>(options =>
+// {
+//     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+//     options.KnownNetworks.Clear();
+//     options.KnownProxies.Clear();
+// });
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!);
 builder.Services
@@ -128,6 +137,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+// app.UseForwardedHeaders();
 
 app.UseCors("AllowAll");
 
