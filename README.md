@@ -27,6 +27,32 @@ Default published ports come from `.env`:
 - `API_EXTERNAL_PORT=8082`
 - `FRONTEND_EXTERNAL_PORT=8081`
 
+## Expose local frontend via ngrok
+
+Use this when you want temporary public access to local frontend from `docker-compose.yml`.
+
+1. Start local/non-production stack.
+2. Open an ngrok tunnel to frontend port `8081`.
+
+```bash
+cp .env.example .env
+docker compose --env-file .env -f docker-compose.yml up --build
+```
+
+```bash
+ngrok http 8081
+```
+
+Take the public HTTPS URL from ngrok output and open it in browser.
+
+If you changed `FRONTEND_EXTERNAL_PORT` in `.env`, use that port instead of `8081`:
+
+```bash
+ngrok http "$FRONTEND_EXTERNAL_PORT"
+```
+
+Note: ngrok gives public internet access to your local app while tunnel is running.
+
 ## Environment files
 
 ### Local / default
