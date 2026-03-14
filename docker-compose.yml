@@ -1,0 +1,55 @@
+services:
+  # ──────────────────────────────────────────────
+  # Microsoft SQL Server 2022
+  # ──────────────────────────────────────────────
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: webapi_db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD:-StrongPassword123!}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' -No || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ──────────────────────────────────────────────
+  # ASP.NET Core 8 Web API
+  # ──────────────────────────────────────────────
+  api:
+    build:
+      context: ./WebApiP33
+      dockerfile: Dockerfile
+    container_name: webapi_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=WebApiP33;User Id=sa;Password=${DB_PASSWORD:-StrongPassword123!};TrustServerCertificate=True;"
+      JwtSettings__SecretKey: "${JWT_SECRET:?JWT_SECRET must be set in .env}"
+      JwtSettings__ExpiryMinutes: "60"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ──────────────────────────────────────────────
+  # Vue 3 frontend served by nginx
+  # ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./vue-front
+      dockerfile: Dockerfile
+    container_name: webapi_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  mssql_data:
