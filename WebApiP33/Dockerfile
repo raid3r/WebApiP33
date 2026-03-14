@@ -2,11 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY WebApiP33.csproj .
-RUN dotnet restore
+COPY WebApiP33/WebApiP33.csproj WebApiP33/
+RUN dotnet restore WebApiP33/WebApiP33.csproj
 
-COPY . .
-RUN dotnet publish -c Release -o /app/publish --no-restore
+COPY WebApiP33/ WebApiP33/
+RUN dotnet publish WebApiP33/WebApiP33.csproj -c Release -o /app/publish --no-restore
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
